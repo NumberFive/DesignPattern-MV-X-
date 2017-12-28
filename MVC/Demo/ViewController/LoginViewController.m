@@ -9,6 +9,7 @@
 #import "LoginViewController.h"
 #import "LoginView.h"
 #import "LoginServices.h"
+#import <KVNProgress/KVNProgress.h>
 
 @interface LoginViewController ()
 @property (nonatomic, strong) LoginServices *services;
@@ -22,12 +23,32 @@
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.navigationItem.title = @"登录";
-    
+    self.navigationItem.title = @"登录(随便输入两位数以上)";
+    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] init];
 }
 - (void)loginAction
 {
-//    NSString *username
+    NSString *username = self.loginView.usernameTF.text;
+    NSString *password = self.loginView.passwordTF.text;
+    
+    if (!username.length) {
+        [KVNProgress showErrorWithStatus:@"请输入账号"];
+    } else if (!password.length) {
+        [KVNProgress showErrorWithStatus:@"请输入密码"];
+    } else {
+        [KVNProgress showWithStatus:@"正在登录中..."];
+        
+        __weak typeof(self) weakSelf = self;
+        [self.services requestLoginUsername:username
+                                   password:password
+                                    success:^(id responser) {
+                                        __strong __typeof(weakSelf) strongSelf = weakSelf;
+                                        [KVNProgress showSuccessWithStatus:@"登录成功"];
+                                        [strongSelf.navigationController popViewControllerAnimated:YES];
+                                    } failure:^(id responser) {
+                                        [KVNProgress showErrorWithStatus:@"登录失败"];
+                                    }];
+    }
 }
 
 #pragma mark - Setter / Getter
