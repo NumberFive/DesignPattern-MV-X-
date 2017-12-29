@@ -23,7 +23,7 @@
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.navigationItem.title = @"操作数据流程";
+    self.navigationItem.title = @"操作数据流程(左划删除)";
     [self requestData];
 }
 
@@ -60,7 +60,7 @@
         __weak typeof(self) weakSelf = self;
         [KVNProgress showWithStatus:@"正在删除数据..."];
         [self.services deleteItemAtIndex:indexPath.row
-                                 Success:^(id responser) {
+                                 success:^(id responser) {
                                      __weak typeof(weakSelf) strongSelf = weakSelf;
                                      [strongSelf.testView.tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
                                      [KVNProgress showSuccessWithStatus:@"删除成功"];

@@ -14,6 +14,6 @@
 - (void)requestDataSuccess:(void (^)(id responser))successHandle
                    failure:(void (^)(id responser))failureHandle;
 - (void)deleteItemAtIndex:(NSInteger)index
-                  Success:(void (^)(id responser))successHandle
+                  success:(void (^)(id responser))successHandle
                   failure:(void (^)(id responser))failureHandle;
 @end
