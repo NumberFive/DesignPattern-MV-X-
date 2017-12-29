@@ -15,8 +15,6 @@
 @property (nonatomic, strong, readonly) UITextField *passwordTF;
 @property (nonatomic, strong, readonly) UIButton *loginButton;
 
-@property (nonatomic, strong) RACSubject *loginSignalSubject;
-
 - (instancetype)initWithViewModel:(LoginViewModel *)viewModel;
 
 

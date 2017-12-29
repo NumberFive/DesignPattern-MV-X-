@@ -10,7 +10,7 @@
 #import <Masonry.h>
 #import "TestServices.h"
 #import <MJRefresh/MJRefresh.h>
-
+#import <ReactiveObjC/ReactiveObjC.h>
 @interface TestView()<UITableViewDelegate,UITableViewDataSource>
 {
     UITableView *_tableView;
@@ -34,11 +34,11 @@
 - (void)refreshData
 {
     if (self.delegate && [self.delegate respondsToSelector:@selector(refreshAction:)]) {
-        __weak typeof(self) weakSelf = self;
+        @weakify(self);
         [self.delegate refreshAction:^(BOOL result) {
-            __weak typeof(weakSelf) strongSelf = weakSelf;
-            [strongSelf.tableView.mj_header endRefreshing];
-            [strongSelf.tableView reloadData];
+            @strongify(self);
+            [self.tableView.mj_header endRefreshing];
+            [self.tableView reloadData];
         }];
     }
 }
@@ -61,13 +61,13 @@
 {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         if (self.delegate && [self.delegate respondsToSelector:@selector(deleteItemAtIndex:complete:)]) {
-            __weak typeof(self) weakSelf = self;
+            @weakify(self);
             [self.delegate deleteItemAtIndex:indexPath.row
                                     complete:^(BOOL result) {
-                                        __weak typeof(weakSelf) strongSelf = weakSelf;
+                                        @strongify(self);
                                         if (result) {
-                                            [strongSelf.tableView deleteRowsAtIndexPaths:@[indexPath]
-                                                                        withRowAnimation:UITableViewRowAnimationFade];
+                                            [self.tableView deleteRowsAtIndexPaths:@[indexPath]
+                                                                  withRowAnimation:UITableViewRowAnimationFade];
                                         }
                                     }];
         }
@@ -87,10 +87,10 @@
         _tableView.delegate = self;
         _tableView.dataSource = self;
         
-        __weak typeof(self) weakSelf = self;
+        @weakify(self);
         _tableView.mj_header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
-            __weak typeof(weakSelf) strongSelf = weakSelf;
-            [strongSelf refreshData];
+            @strongify(self);
+            [self refreshData];
         }];
     }
     return _tableView;

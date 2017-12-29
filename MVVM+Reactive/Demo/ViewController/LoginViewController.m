@@ -29,25 +29,26 @@
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] init];
 }
 
+- (void)loginAction
+{
+    NSString *username = self.viewModel.username;
+    NSString *password = self.viewModel.password;
+    
+    @weakify(self);
+    [self.viewModel requestLoginSuccess:^(id responser) {
+        @strongify(self);
+        [KVNProgress showSuccessWithStatus:@"登录成功"];
+        [self.navigationController popViewControllerAnimated:YES];
+    } failure:^(id responser) {
+        [KVNProgress showErrorWithStatus:@"登录失败"];
+    }];
+}
 #pragma mark - Setter / Getter
 - (LoginView *)loginView
 {
     if (!_loginView) {
         _loginView = [[LoginView alloc] initWithViewModel:self.viewModel];
-        
-        @weakify(self);
-        [_loginView.loginSignalSubject subscribeNext:^(id  _Nullable x) {
-//            [KVNProgress showWithStatus:@"正在登录中..."];
-            NSLog(@"subscribeNext");
-        } error:^(NSError * _Nullable error) {
-            if (error) {
-                [KVNProgress showErrorWithStatus:error.localizedDescription];
-            }
-        } completed:^{
-            @strongify(self);
-            [KVNProgress showSuccessWithStatus:@"登录成功"];
-            [self.navigationController popViewControllerAnimated:YES];
-        }];
+        [_loginView.loginButton addTarget:self action:@selector(loginAction) forControlEvents:UIControlEventTouchUpInside];
     }
     return _loginView;
 }

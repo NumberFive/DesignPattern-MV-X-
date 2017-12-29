@@ -50,6 +50,49 @@
             make.left.right.height.equalTo(self.usernameTF);
             make.top.equalTo(self.passwordTF.mas_bottom).offset(space);
         }];
+        
+        RAC(self.viewModel, username) = self.usernameTF.rac_textSignal;
+        RAC(self.viewModel, password) = self.passwordTF.rac_textSignal;
+        
+        @weakify(self);
+        [[self.usernameTF rac_signalForControlEvents:UIControlEventEditingDidBegin] subscribeNext:^(__kindof UIControl * _Nullable x) {
+            @strongify(self);
+            self.usernameTF.layer.borderColor = [UIColor redColor].CGColor;
+        }];
+        [[self.usernameTF rac_signalForControlEvents:UIControlEventEditingDidEnd] subscribeNext:^(__kindof UIControl * _Nullable x) {
+            @strongify(self);
+            self.usernameTF.layer.borderColor = [UIColor brownColor].CGColor;
+        }];
+        [[self.passwordTF rac_signalForControlEvents:UIControlEventEditingDidBegin] subscribeNext:^(__kindof UIControl * _Nullable x) {
+            @strongify(self);
+            self.passwordTF.layer.borderColor = [UIColor redColor].CGColor;
+        }];
+        [[self.passwordTF rac_signalForControlEvents:UIControlEventEditingDidEnd] subscribeNext:^(__kindof UIControl * _Nullable x) {
+            @strongify(self);
+            self.passwordTF.layer.borderColor = [UIColor brownColor].CGColor;
+        }];
+
+        RACSignal *validUsernameSignal = [self.usernameTF.rac_textSignal map:^(NSString * value) {
+            return @(value.length > 1);
+        }];
+        RACSignal *validPasswordSignal = [self.passwordTF.rac_textSignal map:^(NSString *value) {
+            return @(value.length > 1);
+        }];
+        RAC(self.usernameTF, backgroundColor) = [validUsernameSignal map:^(NSNumber *valid) {
+            return valid.boolValue ? [UIColor greenColor] : [UIColor clearColor];
+        }];
+        RAC(self.passwordTF, backgroundColor) = [validPasswordSignal map:^(NSNumber *valid) {
+            return valid.boolValue ? [UIColor greenColor] : [UIColor clearColor];
+        }];
+        
+        RACSignal *loginActiveSignal = [RACSignal combineLatest:@[validUsernameSignal,validPasswordSignal] reduce:^id(NSNumber*usernameValid, NSNumber *passwordValid){
+            return @([usernameValid boolValue]&&[passwordValid boolValue]);
+        }];
+        [loginActiveSignal subscribeNext:^(NSNumber *active) {
+            @strongify(self);
+            self.loginButton.enabled = [active boolValue];
+            self.loginButton.backgroundColor = active.boolValue ? [UIColor brownColor] : [UIColor grayColor];
+        }];
     }
     return self;
 }
@@ -59,56 +102,7 @@
     [self.usernameTF resignFirstResponder];
     [self.passwordTF resignFirstResponder];
 }
-- (RACSignal *)loginSignal
-{
-    NSString *username = self.viewModel.username;
-    NSString *password = self.viewModel.password;
-    @weakify(self);
-    RACSignal *signal = [RACSignal createSignal:^RACDisposable *(id<RACSubscriber> subscriber) {
-        @strongify(self);
-        if (!username.length) {
-            [self.usernameTF becomeFirstResponder];
-            NSError *error = [NSError errorWithDomain:NSCocoaErrorDomain
-                                                 code:0
-                                             userInfo:@{NSLocalizedDescriptionKey:@"请输入账号"}];
-            [self.loginSignalSubject sendNext:error];
-            [self.usernameTF becomeFirstResponder];
-        } else if (!password.length) {
-            [self.usernameTF becomeFirstResponder];
-            NSError *error = [NSError errorWithDomain:NSCocoaErrorDomain
-                                                 code:0
-                                             userInfo:@{NSLocalizedDescriptionKey:@"请输入密码"}];
-            [self.loginSignalSubject sendNext:error];
-            [self.passwordTF becomeFirstResponder];
-        } else {
-            [self.viewModel requestLoginSuccess:^(id responser) {
-                [self.loginSignalSubject sendCompleted];
-            } failure:^(id responser) {
-                NSError *error = [NSError errorWithDomain:NSCocoaErrorDomain
-                                                     code:0
-                                                 userInfo:@{NSLocalizedDescriptionKey:@"登录失败"}];
-                [self.loginSignalSubject sendNext:error];
-            }];
-        }
-        [subscriber sendNext:@"hello"];
-        return nil;
-    }];
-    _signal = signal;
-    return signal;
-}
 
-#pragma mark - UITextFieldDelegate
-- (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string
-{
-    if (textField == self.usernameTF) {
-        NSString *username = textField.text;
-        self.viewModel.username = [username stringByReplacingCharactersInRange:range withString:string];
-    } else if (textField == self.passwordTF) {
-        NSString *password = textField.text;
-        self.viewModel.password = [password stringByReplacingCharactersInRange:range withString:string];
-    }
-    return YES;
-}
 #pragma mark - Setter / Getter
 - (UITextField *)usernameTF
 {
@@ -120,7 +114,6 @@
         _usernameTF.textColor = [UIColor grayColor];
         _usernameTF.font = [UIFont systemFontOfSize:25.0];
         _usernameTF.placeholder = @"请输入账号";
-        _usernameTF.delegate = self;
     }
     return _usernameTF;
 }
@@ -135,7 +128,6 @@
         _passwordTF.font = [UIFont systemFontOfSize:25.0];
         _passwordTF.placeholder = @"请输入密码";
         _passwordTF.secureTextEntry = YES;
-        _passwordTF.delegate = self;
     }
     return _passwordTF;
 }
@@ -146,29 +138,8 @@
         [_loginButton setTitle:@"登  录" forState:UIControlStateNormal];
         _loginButton.backgroundColor = [UIColor brownColor];
         _loginButton.layer.cornerRadius = 5.0;
-        
-        @weakify(self);
-        [[[_loginButton rac_signalForControlEvents:UIControlEventTouchUpInside] map:^id(__kindof UIControl * _Nullable value) {
-            @strongify(self);
-            return [self loginSignal];
-        }] subscribeNext:^(id x){
-            
-            
-            [x subscribeNext:^(id  _Nullable x) {
-                @strongify(self);
-                NSLog(@"%@",x);
-            }];
-            
-        }];
     }
     return _loginButton;
-}
-- (RACSubject *)loginSignalSubject
-{
-    if (!_loginSignalSubject) {
-        _loginSignalSubject = [RACSubject subject];
-    }
-    return _loginSignalSubject;
 }
 
 @end

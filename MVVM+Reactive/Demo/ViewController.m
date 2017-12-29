@@ -21,11 +21,10 @@
     
     [self addChildViewController:self.nav];
     [self.view addSubview:self.nav.view];
-    [self showLogin];
-//    UserCenterViewModel *userViewModel = [UserCenterViewModel sharedUserCenterViewModel];
-//    if (!userViewModel.isLogined) {
-//        [self showLogin];
-//    }
+    UserCenterViewModel *userViewModel = [UserCenterViewModel sharedUserCenterViewModel];
+    if (!userViewModel.isLogined) {
+        [self showLogin];
+    }
 }
 
 - (void)showLogin

@@ -9,7 +9,7 @@
 #import "TestViewModel.h"
 #import "TestServices.h"
 #import "TestStore.h"
-
+#import <ReactiveObjC/ReactiveObjC.h>
 @interface TestViewModel ()
 @property (nonatomic, strong) TestServices *services;
 @property (nonatomic, strong) TestStore *store;
@@ -27,10 +27,10 @@
 - (void)requestDataSuccess:(void (^)(id responser))successHandle
                    failure:(void (^)(id responser))failureHandle
 {
-    __weak typeof(self) weakSelf = self;
+    @weakify(self);
     [self.services requestDataSuccess:^(id responser) {
-        __strong typeof(weakSelf) strongSelf = weakSelf;
-        strongSelf.dataArray = responser;
+        @strongify(self);
+        self.dataArray = responser;
         if (successHandle) {
             successHandle(responser);
         }
@@ -44,13 +44,13 @@
                   success:(void (^)(id responser))successHandle
                   failure:(void (^)(id responser))failureHandle
 {
-    __weak typeof(self) weakSelf = self;
+    @weakify(self);
     [self.services deleteItemAtIndex:index
                              success:^(id responser) {
-                                 __strong typeof(weakSelf) strongSelf = weakSelf;
-                                 NSMutableArray *array = [strongSelf.dataArray mutableCopy];
+                                 @strongify(self);
+                                 NSMutableArray *array = [self.dataArray mutableCopy];
                                  [array removeObjectAtIndex:index];
-                                 strongSelf.dataArray = array;
+                                 self.dataArray = array;
                                  if (successHandle) {
                                      successHandle(responser);
                                  }
