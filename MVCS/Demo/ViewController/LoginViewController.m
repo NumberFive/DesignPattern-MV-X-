@@ -6,10 +6,11 @@
 //  Copyright © 2017年 wxh. All rights reserved.
 //
 
+#import <KVNProgress/KVNProgress.h>
 #import "LoginViewController.h"
 #import "LoginView.h"
 #import "LoginServices.h"
-#import <KVNProgress/KVNProgress.h>
+#import "UserCenterServices.h"
 
 @interface LoginViewController ()
 @property (nonatomic, strong) LoginServices *services;
@@ -32,8 +33,10 @@
     NSString *password = self.loginView.passwordTF.text;
     
     if (!username.length) {
+        [self.loginView.usernameTF becomeFirstResponder];
         [KVNProgress showErrorWithStatus:@"请输入账号"];
     } else if (!password.length) {
+        [self.loginView.passwordTF becomeFirstResponder];
         [KVNProgress showErrorWithStatus:@"请输入密码"];
     } else {
         [KVNProgress showWithStatus:@"正在登录中..."];
@@ -44,7 +47,8 @@
                                     success:^(id responser) {
                                         __strong __typeof(weakSelf) strongSelf = weakSelf;
                                         [KVNProgress showSuccessWithStatus:@"登录成功"];
-                                        
+                                        UserCenterServices *userCenter = [UserCenterServices sharedUserCenterServices];
+                                        userCenter.isLogined = YES;
                                         [strongSelf.navigationController popViewControllerAnimated:YES];
                                     } failure:^(id responser) {
                                         [KVNProgress showErrorWithStatus:@"登录失败"];

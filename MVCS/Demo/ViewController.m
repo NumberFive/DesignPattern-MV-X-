@@ -9,6 +9,7 @@
 #import "ViewController.h"
 #import "TestViewController.h"
 #import "LoginViewController.h"
+#import "UserCenterServices.h"
 @interface ViewController ()
 @property (nonatomic, strong) UINavigationController *nav;
 @end
@@ -20,7 +21,11 @@
     
     [self addChildViewController:self.nav];
     [self.view addSubview:self.nav.view];
-    [self showLogin];
+    
+    UserCenterServices *services = [UserCenterServices sharedUserCenterServices];
+    if (!services.isLogined) {
+        [self showLogin];
+    }
 }
 
 - (void)showLogin

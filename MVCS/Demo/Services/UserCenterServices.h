@@ -7,7 +7,8 @@
 //
 
 #import <Foundation/Foundation.h>
-
+#import "MacroDefine.h"
 @interface UserCenterServices : NSObject
+SINGLE_INTERFACE(UserCenterServices)
 @property (nonatomic, assign) BOOL isLogined;
 @end

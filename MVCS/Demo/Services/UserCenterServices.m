@@ -16,7 +16,7 @@
 @end
 @implementation UserCenterServices
 @synthesize isLogined = _isLogined;
-
+SINGLE_IMPLEMENTATION(UserCenterServices)
 #pragma mark - Setter / Getter
 - (void)setIsLogined:(BOOL)isLogined
 {

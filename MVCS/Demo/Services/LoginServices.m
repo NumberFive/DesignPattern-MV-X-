@@ -17,10 +17,14 @@
     //合法性严重
     if (username.length > 1 && password.length > 1) {
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            successHandle(@"登录成功");
+            if (successHandle) {
+                successHandle(@"登录成功");
+            }
         });
     } else {
-        failureHandle(@"账号不合格");
+        if (failureHandle) {
+            failureHandle(@"账号不合格");
+        }
     }
 }
 @end

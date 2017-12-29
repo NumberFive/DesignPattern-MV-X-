@@ -57,6 +57,7 @@
 		E86615301FF3B130003DEF31 /* TestViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestViewController.m; sourceTree = "<group>"; };
 		E86615321FF3B13D003DEF31 /* LoginViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LoginViewController.h; sourceTree = "<group>"; };
 		E86615331FF3B13D003DEF31 /* LoginViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LoginViewController.m; sourceTree = "<group>"; };
+		E885A7C81FF5D8ED00BC9B50 /* MacroDefine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MacroDefine.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -116,6 +117,7 @@
 				E86615081FF3AE12003DEF31 /* AppDelegate.m */,
 				E866150A1FF3AE12003DEF31 /* ViewController.h */,
 				E866150B1FF3AE12003DEF31 /* ViewController.m */,
+				E885A7C81FF5D8ED00BC9B50 /* MacroDefine.h */,
 				E84810771FF4F42300C16ED3 /* Store */,
 				E866151F1FF3B0BC003DEF31 /* Services */,
 				E866151E1FF3B0BC003DEF31 /* View */,
